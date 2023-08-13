@@ -1,0 +1,42 @@
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\bin\Debug\packetSniffer.exe.config
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\bin\Debug\packetSniffer.exe
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\bin\Debug\packetSniffer.pdb
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.csprojAssemblyReference.cache
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer_MarkupCompile.cache
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer_MarkupCompile.lref
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.g.resources
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.Properties.Resources.resources
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.csproj.GenerateResource.cache
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.csproj.CoreCompileInputs.cache
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.exe
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.pdb
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\packetSniffer.csproj.CopyComplete
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\Views\MainWindow.g.cs
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\Views\App.g.cs
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\Views\App.baml
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\Views\MainWindow.baml
+C:\Users\Andrzej\source\repos\packetSniffer\packetSniffer\obj\Debug\UserControls\CustomComboBoxStyle.baml
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.csprojAssemblyReference.cache
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\UserControls\CustomComboBoxStyle.baml
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\Views\MainWindow.g.cs
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\Views\App.g.cs
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer_MarkupCompile.cache
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer_MarkupCompile.lref
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.exe
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.pdb
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\bin\Debug\packetSniffer.exe.config
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\bin\Debug\packetSniffer.exe
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\bin\Debug\packetSniffer.pdb
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\Views\App.baml
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\Views\MainWindow.baml
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.g.resources
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.Properties.Resources.resources
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.csproj.GenerateResource.cache
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.csproj.CoreCompileInputs.cache
+C:\Users\Andrzej\source\repos\packetSniffer - refa\packetSniffer\obj\Debug\packetSniffer.csproj.CopyComplete
