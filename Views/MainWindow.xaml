@@ -1,0 +1,392 @@
+﻿<Window x:Class="packetSniffer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:packetSniffer"
+        mc:Ignorable="d"
+        Title="SimplePacketSniffer" Height="450" Width="800"
+        Background="#090E1A"
+        Foreground="#94A3B8"
+        TextBlock.Foreground="#94A3B8"
+        TextBlock.FontSize="11"
+        ResizeMode="CanMinimize"
+        Icon="../Icons/Iconv2.png"
+        FontFamily="Inter">
+    <Window.Resources>
+        <Style x:Key="TextBoxStylee" TargetType="TextBox">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Background" Value="#090E1A"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#94A3B8"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <EventSetter Event="PreviewTextInput" Handler="CheckIfNumber"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="bord" BorderBrush="#94A3B8" BorderThickness="1" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="bord" Value="#94A3B8"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="BorderThickness" Value="1" TargetName="bord"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- For closing filter menu anywhere you want -->
+        <local:InverseBooleanConverter x:Key="InverseBoolConverter"/>
+    </Window.Resources>
+    <!-- App form -->
+    <Grid>
+        <!-- Home Menu - start window -->
+        <Grid FocusVisualStyle="{x:Null}" x:Name="HomeMenu" Visibility="Visible">
+            <StackPanel Margin="1,4,0,0">
+                <!-- Left navigation panel - all capture and send buttons -->
+                <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" Width="160">
+                    <Label HorizontalContentAlignment="Center" Content="Choose process" Style="{StaticResource FontStyle}"/>
+                    <ComboBox x:Name="ProcessList" SelectedIndex="0" DropDownOpened="ComboboxOpen" Foreground="Black" Width="138">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} : {1}">
+                                            <Binding Path="ProcessName" />
+                                            <Binding Path="Id" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <StackPanel Margin="0,1,0,2">
+                        <Button x:Name="CaptureStart" Style="{StaticResource ButtonStyle}" Content="Start" Click="StartClickEvent" Margin="0,10,0,0"/>
+                        <Button x:Name="CaptureStop" Style="{StaticResource ButtonStyle}" Content="Stop" Foreground="Black" Margin="0,9,0,8"/>
+                        <Grid Margin="0,0,0,1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.4*"/>
+                                <ColumnDefinition Width="0.9*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" x:Name="CaptureStatus" Margin="0,0,0,0" Width="10" Height="10" BorderBrush="#DB0000" BorderThickness="5" CornerRadius="3" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                            <Label Padding="2" Grid.Column="1" Content="Capturing" Style="{StaticResource FontStyle}" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                        </Grid>
+                        <!--<Border Margin="-3,0,-3,0" Width="175" BorderBrush="#94A3B8" BorderThickness="0,0,0,1.3" VerticalAlignment="Bottom"/>-->
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,1">
+                        <Label Content="Send UDP Packets" Style="{StaticResource FontStyle}"/>
+                        <Button Content="Add Packet" Style="{StaticResource ButtonStyle}" Click="AddPacketEvent"/>
+                    </StackPanel>
+                    <Grid Margin="0,0,0,1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <Label Content="Delay" Style="{StaticResource FontStyle}"/>
+                            <TextBox x:Name="PacketDelay" Width="55" Text="1000" Margin="4,3,4,0" Style="{StaticResource TextBoxStyle}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <Label Content="Amount" Style="{StaticResource FontStyle}"/>
+                            <TextBox x:Name="PacketCount" Width="55" Text="1" Margin="4,3,4,0" Style="{StaticResource TextBoxStyle}"/>
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Margin="4,15,4,20">
+                        <Button Style="{StaticResource ButtonStyle}" Content="Send" Click="Sendpacket_Click"/>
+                        <Button x:Name="StopSendingButton" Margin="0,9,0,0" Style="{StaticResource ButtonStyle}" Content="Stop seding packets"/>
+                        <Label Margin="5,10,0,0" Content="{Binding ElementName=List, Path=Items.Count}" ContentStringFormat="Total Packets: {0}" FontSize="12" Style="{StaticResource FontStyle}" HorizontalContentAlignment="Left"/>
+                        <Label Margin="5,0,0,0" x:Name="TotalSize" Content="Total Packet Size: 0 B" FontSize="12" Style="{StaticResource FontStyle}" HorizontalContentAlignment="Left"/>
+                        <Label Margin="5,0,0,0" x:Name="TotalSended" Content="Total Packet Sended: 0" FontSize="12" Style="{StaticResource FontStyle}" HorizontalContentAlignment="Left"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            <!-- Right navigation panel - all data, datagrids -->
+            <Grid HorizontalAlignment="Right" Width="620">
+                <Border BorderBrush="#94A3B8" BorderThickness="1.3,0,0,0"/>
+                <Grid Margin="20,0,20,0">
+                    <!-- Capture packet list - all packets are here -->
+                    <DataGrid IsReadOnly="True" Style="{StaticResource CustomDataGridStyle}" CellStyle="{StaticResource DataGridCellStyle}" ColumnHeaderStyle="{StaticResource HeaderStyle}" RowStyle="{StaticResource DataGridRowStyle}" Background="#090E1A" Foreground="Black" x:Name="List" BorderThickness="0,1.3,0,1.3" BorderBrush="#94A3B8" Width="520" Height="240" VerticalAlignment="Top" Margin="7,43,7,0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Id}" ElementStyle="{StaticResource ElementSty}" Width="0.7*"/>
+                            <!--0.7-->
+                            <DataGridTextColumn Header="Source IP" Binding="{Binding SourceIp}" ElementStyle="{StaticResource ElementSty}" Width="1.6*"/>
+                            <!--1.6-->
+                            <DataGridTextColumn Header="Destination IP" Binding="{Binding DestinationIp}" ElementStyle="{StaticResource ElementSty}" Width="1.6*"/>
+                            <!--1.6-->
+                            <DataGridTextColumn Header="Protocol" Binding="{Binding PacketType}" ElementStyle="{StaticResource ElementSty}" Width="*"/>
+                            <!--*-->
+                            <DataGridTextColumn Header="Source Port" Binding="{Binding PortSource}" ElementStyle="{StaticResource ElementSty}" Width="1.2*"/>
+                            <!--1.2-->
+                            <DataGridTextColumn Header="Destination Port" Binding="{Binding PortDestination}" ElementStyle="{StaticResource ElementSty}" Width="1.6*"/>
+                            <!--1.6-->
+                            <DataGridTextColumn Header="Lenght" Binding="{Binding TotalLenght}" ElementStyle="{StaticResource ElementSty}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <!-- Content of packet is here - hex bytes and ASCII text-->
+                    <Grid Margin="3,0,0,0" Width="{Binding ElementName=List, Path=Width}"  Height="130" VerticalAlignment="Bottom">
+                        <DataGrid Padding="5,6,0,5" IsReadOnly="True" Style="{StaticResource CustomDataGridStyle}" SelectionUnit="Cell" RowStyle="{StaticResource DataGridHexRowStyle}" ColumnHeaderStyle="{StaticResource DataGridheaderHex}" CellStyle="{StaticResource DataGridHexCellStyle}" x:Name="contentBytes" Height="120" Background="#090E1A" Foreground="#94A3B8" VerticalAlignment="Top" Margin="0,2,0,0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="" Binding="{Binding [0]}" Width="0.1*" Foreground="#A33737" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="00" Width="0.1*" Binding="{Binding [1]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="01" Width="0.1*" Binding="{Binding [2]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="02" Width="0.1*" Binding="{Binding [3]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="03" Width="0.1*" Binding="{Binding [4]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="04" Width="0.1*" Binding="{Binding [5]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="05" Width="0.1*" Binding="{Binding [6]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="06" Width="0.1*" Binding="{Binding [7]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="07" Width="0.1*" Binding="{Binding [8]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="08" Width="0.1*" Binding="{Binding [9]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="09" Width="0.1*" Binding="{Binding [10]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="09" Width="0.1*" Binding="{Binding [11]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="0A" Width="0.1*" Binding="{Binding [12]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="0B" Width="0.1*" Binding="{Binding [13]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="0C" Width="0.1*" Binding="{Binding [14]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="0D" Width="0.1*" Binding="{Binding [15]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="0E" Width="0.1*" Binding="{Binding [16]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="0F" Width="0.1*" Binding="{Binding [17]}" ElementStyle="{StaticResource ElementSty}"/>
+                                <DataGridTextColumn Header="" Width="0.7*" Binding="{Binding [18]}" ElementStyle="{StaticResource ElementStyHex}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+        <!-- Option Menu - all options -->
+        <Grid x:Name="OptionMenu" FocusVisualStyle="{x:Null}" Visibility="Hidden" Background="#090E1A">
+            <Label Margin="30,35,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Grid.Column="0" Content="Settings" FontSize="30" Style="{StaticResource Fontss}"/>
+            <!-- Control with individual boxes -->
+            <TabControl Margin="30,45,25,60" Grid.Column="1" Style="{StaticResource TabControlStyle}">
+                <!-- Capture tab with interfaces, capture time and show current local ip address -->
+                <TabItem Header="Capture" Style="{StaticResource FirstTabItemStyle}" Height="110">
+                    <Grid>
+                        <Border Margin="-2,77,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="1" Width="89" BorderBrush="#94A3B8" BorderThickness="1"/>
+                        <Grid Width="520" VerticalAlignment="Top" HorizontalAlignment="Right" Height="270" Background="#090E1A">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2" Panel.ZIndex="5" BorderBrush="#94A3B8" BorderThickness="1"/>
+                            <StackPanel Margin="30,0,0,0" Grid.Column="0">
+                                <Label Content="Interface" Style="{StaticResource OptionFonts}"/>
+                                <ComboBox x:Name="NetInterfaces" DisplayMemberPath="Name" Width="130" SelectedIndex="0" HorizontalAlignment="Left" SelectionChanged="SelectionChangedEvent"/>
+                                <Label Margin="0,30,0,10" Content="IP packet type" Style="{StaticResource OptionFonts}"/>
+                                <ComboBox x:Name="PacketType" SelectedIndex="0" Width="130" HorizontalAlignment="Left">
+                                    <ComboBoxItem>IPv4</ComboBoxItem>
+                                    <ComboBoxItem>IPv6</ComboBoxItem>
+                                </ComboBox>
+                                <Label Content="Capture stop after" Style="{StaticResource OptionFonts}"/>
+                                <Grid>
+                                    <TextBox x:Name="CapDur" Text="Inf" Width="130" Height="20" Style="{StaticResource TextBoxStylee}"/>
+                                    <Label Width="30" Margin="65,0,0,0" Content="sec" Style="{StaticResource Fontss}"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Margin="80,0,0,0" Grid.Column="1">
+                                <Label Content="IP address" Style="{StaticResource OptionFonts}"/>
+                                <Label x:Name="IPaddressControl" Content="127.0.0.1" Style="{StaticResource Fontss}" Padding="0" FontWeight="Normal"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <!-- File tab with path to file box and file format radio buttons - .pkt not yet implemented -->
+                <TabItem Header="File" Style="{StaticResource TabItemStyle}">
+                    <Grid>
+                        <Border Margin="-2,128,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="1" Width="90" BorderBrush="#94A3B8" BorderThickness="1"/>
+                        <Grid Width="520" VerticalAlignment="Top" HorizontalAlignment="Right" Height="270" Background="#090E1A">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2" Panel.ZIndex="5" BorderBrush="#94A3B8" BorderThickness="1"/>
+                            <StackPanel Margin="30,0,0,0" Grid.Column="0">
+                                <Label Content="Output file" Style="{StaticResource OptionFonts}"/>
+                                <Grid>
+                                    <TextBox x:Name="FileDialogText" IsReadOnly="True" Width="180" Height="20" Style="{StaticResource TextBoxStylee}"/>
+                                    <Button x:Name="Buttt" Margin="180,0,0,0" Width="50" Content="Browse" Style="{StaticResource FilterButton}"/>
+                                </Grid>
+                                <Label Content="Output format" Style="{StaticResource OptionFonts}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <RadioButton IsChecked="True" x:Name="Rjson" Grid.Column="0" Style="{StaticResource RadioButtonStyle}"/>
+                                    <Label Margin="20,0,0,0" Content=".js" Style="{StaticResource Fontss}" FontWeight="Normal"/>
+                                    <RadioButton x:Name="Rtxt" Grid.Column="1" Style="{StaticResource RadioButtonStyle}"/>
+                                    <Label Grid.Column="1" Margin="20,0,0,0" Content=".txt" Style="{StaticResource Fontss}" FontWeight="Normal"/>
+                                    <RadioButton x:Name="Rpkt" Grid.Column="2" Style="{StaticResource RadioButtonStyle}"/>
+                                    <Label Grid.Column="2" Margin="20,0,0,0" Content=".pkt" Style="{StaticResource Fontss}" FontWeight="Normal"/>
+                                </Grid>
+                                <Button Margin="0,25,0,0" Width="80" Height="20" Grid.Column="0" Content="Write To File" Style="{StaticResource FilterButton}" Click="WriteButtonEvent"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <!-- Memory tab - memory restrictions for captured packets - size, range -->
+                <TabItem Header="Memory" Style="{StaticResource TabItemStyle}">
+                    <Grid>
+                        <Border Margin="-2,178,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="1" Width="90" BorderBrush="#94A3B8" BorderThickness="1"/>
+                        <Grid Width="520" VerticalAlignment="Top" HorizontalAlignment="Right" Height="270" Background="#090E1A">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2" Panel.ZIndex="5" BorderBrush="#94A3B8" BorderThickness="1"/>
+                            <StackPanel Margin="30,0,0,0" Grid.Column="0">
+                                <Label Content="Max packet size" Style="{StaticResource OptionFonts}"/>
+                                <Grid>
+                                    <TextBox x:Name="MaxPcktSize" Text="Inf" Width="110" Style="{StaticResource TextBoxStylee}"/>
+                                    <Label Margin="120,0,0,0" Content="kB" Style="{StaticResource OptionFonts}"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel Margin="30,0,0,0" Grid.Column="1">
+                                <Label Content="Max packet range" Style="{StaticResource OptionFonts}"/>
+                                <Grid>
+                                    <TextBox x:Name="MaxPcktCount" Text="Inf" Width="110" Style="{StaticResource TextBoxStylee}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <!-- Option buttons - save option variables - reset option variables -->
+            <Grid Margin="260,0,30,110" VerticalAlignment="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="SaveButt" Width="80" Height="20" Content="Save" Grid.Column="0" Style="{StaticResource FilterButton}"/>
+                <Button x:Name="ResetButt" Width="80" Height="20" Content="Reset" Grid.Column="1" Style="{StaticResource FilterButton}"/>
+            </Grid>
+        </Grid>
+        <!-- Top navigation buttons - filter captured packets menu - return to home - show options - close app -->
+        <Grid Panel.ZIndex="3" Width="160" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,15,6,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <!-- Filter menu - popup - open when click - close if outof menu - close if clicked two times -->
+            <Popup x:Name="PopupEle" IsOpen="{Binding ElementName=ButtFilter, Path=IsChecked, Mode=TwoWay}" HorizontalOffset="155" VerticalOffset="25" Placement="Left" StaysOpen="False">
+                <Grid Background="Transparent">
+                    <Border BorderBrush="#94A3B8" Background="Transparent" BorderThickness="1" CornerRadius="6"/>
+                    <StackPanel Margin="10,0,0,0">
+                        <!-- Filter options form - protocol filter - ip - port -->
+                        <Grid Margin="4.5,10,0,0" Height="170" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="0.88*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="0" Content="Protocol: " HorizontalAlignment="Left" Padding="0"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="1" Content="Source Port " Padding="0"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="1" Grid.Row="2" Content="Destination Port " Padding="0"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="0" Grid.Row="1" Margin="20,0,0,0" Content="IGMP"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="0" Grid.Row="2" Margin="20,0,0,0" Content="TCP"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="0" Grid.Row="3" Margin="20,0,0,0" Content="UDP"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="1" Grid.Row="4" Content="Destination IP" Padding="0"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="0" Grid.Row="4" Content="Source IP" Padding="0"/>
+                            <CheckBox x:Name="CHIGMP" IsChecked="True" Style="{DynamicResource ChBoxStyle}"  Grid.Column="0" Grid.Row="1"/>
+                            <CheckBox x:Name="CHTCP" IsChecked="True" Style="{DynamicResource ChBoxStyle}" Grid.Column="0" Grid.Row="2"/>
+                            <CheckBox x:Name="CHUDP" IsChecked="True" Style="{DynamicResource ChBoxStyle}" Grid.Column="0" Grid.Row="3"/>
+                            <TextBox x:Name="TXDest" Style="{StaticResource TextBoxStylee}" Grid.Column="1" Grid.Row="3" Width="100"/>
+                            <TextBox x:Name="TXSource" Style="{StaticResource TextBoxStylee}" Grid.Column="1" Grid.Row="1" Width="100"/>
+                            <TextBox x:Name="TXSourceIp" Style="{StaticResource TextBoxStylee}" Grid.Column="0" Grid.Row="5" Width="100"/>
+                            <TextBox x:Name="TXDestIp" Style="{StaticResource TextBoxStylee}" Grid.Column="1" Grid.Row="5" Width="100"/>
+                        </Grid>
+                        <!-- Packet size and packet type filter - sended - ip = source - received - ip = destination -->
+                        <Grid Width="247" Height="97">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label Style="{StaticResource Fontss}" Content="From" Grid.Column="1"  HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                            <Label  Style="{StaticResource Fontss}" Content="To" Grid.Column="2"  HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                            <Label  Style="{StaticResource Fontss}" Padding="4.5,0,0,0" VerticalAlignment="Top" Content="Packet Size" Grid.Column="0" Grid.Row="1"/>
+                            <TextBox x:Name="TXFrom" Style="{StaticResource TextBoxStylee}" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1"  Width="50" Height="16"/>
+                            <TextBox x:Name="TXTo" Style="{StaticResource TextBoxStylee}" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="1"  Width="50" Height="16"/>
+                            <Label Style="{StaticResource Fontss}" Grid.Column="0" Grid.Row="2" Content="Packet Type" />
+                            <ComboBox x:Name="CBType" SelectedIndex="0" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Width="133" Height="16" >
+                                <ComboBoxItem>All</ComboBoxItem>
+                                <ComboBoxItem>Sended</ComboBoxItem>
+                                <ComboBoxItem>Recieved</ComboBoxItem>
+                            </ComboBox>
+                        </Grid>
+                        <Grid Margin="0,3,0,10" Height="40">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Save filter - Reset default values -->
+                            <Button x:Name="FilterSaveButt" Click="FilterSaveEvent" Style="{StaticResource FilterButton}" Width="55" Height="18" Grid.Column="0" Content="Save"/>
+                            <Button x:Name="FilterResetButt" Style="{StaticResource FilterButton}" Width="55" Height="18" Grid.Column="1" Content="Reset"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Popup>
+            <!-- Navigation button with tooltips -->
+            <ToggleButton x:Name="ButtFilter" IsHitTestVisible="{Binding IsOpen, ElementName=PopupEle, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}" Grid.Column="0" Style="{StaticResource TGStyle}">
+                <Image Source="../Icons/Filter.png" Stretch="Uniform"/>
+                <ToggleButton.ToolTip>
+                    <ToolTip Style="{StaticResource CustomTooltipMenu}">
+                        <Label Content="Filter" Style="{StaticResource TooltipLabel}"/>
+                    </ToolTip>
+                </ToggleButton.ToolTip>
+            </ToggleButton>
+            <ToggleButton x:Name="HomeButton" IsChecked="True" Grid.Column="1" Style="{StaticResource TGStyle}" Click="OpenMenuEvent">
+                <Image Source="../Icons/Home.png" Stretch="Uniform"/>
+                <ToggleButton.ToolTip>
+                    <ToolTip Style="{StaticResource CustomTooltipMenu}">
+                        <Label Content="Home" Style="{StaticResource TooltipLabel}"/>
+                    </ToolTip>
+                </ToggleButton.ToolTip>
+            </ToggleButton>
+            <ToggleButton x:Name="OptionButton" Grid.Column="2" Style="{StaticResource TGStyle}" Click="OpenMenuEvent">
+                <Image Source="../Icons/Options.png" Stretch="Uniform"/>
+                <ToggleButton.ToolTip>
+                    <ToolTip Style="{StaticResource CustomTooltipMenu}">
+                        <Label Content="Options" Style="{StaticResource TooltipLabel}"/>
+                    </ToolTip>
+                </ToggleButton.ToolTip>
+            </ToggleButton>
+            <Button x:Name="AppClose" Grid.Column="3">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource TopMenuButtonStyle}">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Effect" Value="{StaticResource ShadowEffectOnHoverRed}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Image Source="../Icons/Close.png" Stretch="Uniform"/>
+                <Button.ToolTip>
+                    <ToolTip Style="{StaticResource CustomTooltipMenu}">
+                        <Label Content="Close" Style="{StaticResource TooltipLabel}"/>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>
